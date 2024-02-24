@@ -10,20 +10,50 @@
 	rebindButton(downloadButton, async () => {
 		const result = await fetch(window.location.href);
 		const html = await result.text();
-		const match = /"file_preview":("[^"]*")/.exec(html);
-		if (!match) {
-			console.error('[StudyDrive Download] File preview not found', html);
+
+		
+		const parsedLink = getDownloadLink(html);
+		if (!parsedLink) {
+			console.error('[StudyDrive Download] Download link not found', html);
 			return;
 		}
-		const parsedLink = JSON.parse(match[1]);
-		window.open(parsedLink, '_blank');
+
+		const fileName = getFileName(html);
+
+		const downloadResult = await fetch(parsedLink);
+		const blob = await downloadResult.blob();
+		downloadFile(blob, fileName);
 	});
+
+	function getDownloadLink(html) {
+		const linkMatch = /"file_preview":("[^"]*")/.exec(html);
+		if (!linkMatch) {
+			return null;
+		}
+		return JSON.parse(linkMatch[1]);
+	}
+
+	function getFileName(html) {
+		const fileNameMatch = /"filename":("[^"]*")/.exec(html);
+		if (!fileNameMatch) {
+			return "preview.pdf";
+		}
+		return JSON.parse(fileNameMatch[1]);
+	}
 
 	function rebindButton(button, listener) {
 		const parent = button.parentElement;
 		const newButton = button.cloneNode(true);
 		parent.replaceChild(newButton, button);
 		newButton.onclick = listener;
+	}
+
+	function downloadFile(blob, fileName) {
+		var link = document.createElement('a');
+		link.download = fileName;
+		link.href = window.URL.createObjectURL(blob);
+		link.target = "_blank";
+		link.click();
 	}
 	
 	async function findDownloadButton(maxTries, timeout) {
