@@ -10,8 +10,12 @@
 	rebindButton(downloadButton, async () => {
 		const result = await fetch(window.location.href);
 		const html = await result.text();
-		const jsonLink = /"file_preview":\s("[^"]*")/.exec(html)[1];
-		const parsedLink = JSON.parse(jsonLink);
+		const match = /"file_preview":("[^"]*")/.exec(html);
+		if (!match) {
+			console.error('[StudyDrive Download] File preview not found', html);
+			return;
+		}
+		const parsedLink = JSON.parse(match[1]);
 		window.open(parsedLink, '_blank');
 	});
 
