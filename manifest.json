@@ -1,0 +1,21 @@
+{
+  "name": "StudyDrive Download",
+  "version": "0.0.1",
+  "manifest_version": 3,
+  "description": "Well StudyDrive Downloads are free now ...",
+  "homepage_url": "https://khad.im",
+  "icons": {
+    "128": "icons/icon.png"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "src/index.js"
+      ],
+      "matches": [
+        "https://www.studydrive.net/*"
+      ],
+      "world": "MAIN"
+    }
+  ]
+}
